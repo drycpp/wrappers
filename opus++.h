@@ -13,8 +13,8 @@
 #error "<opus++.h> requires a C++ compiler"
 #endif
 
-#if __cplusplus < 201103L
-#error "<opus++.h> requires a C++11 compiler (CXXFLAGS='-std=c++11')"
+#if __cplusplus < 201402L
+#error "<opus++.h> requires a C++14 compiler (CXXFLAGS='-std=c++14')"
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

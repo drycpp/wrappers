@@ -11,6 +11,10 @@
 #error "<erl++.h> requires a C++ compiler"
 #endif
 
+#if __cplusplus < 201703L
+#error "<erl++.h> requires a C++17 compiler (CXXFLAGS='-std=c++17')"
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <erl_interface.h>
