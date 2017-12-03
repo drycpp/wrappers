@@ -89,11 +89,11 @@ protected:
 
 public:
   // @see https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__encoder.html#gaa89264fd93c9da70362a0c9b96b9ca88
-  static encoder create(const int freq,
+  static encoder create(const int frequency,
                         const int channels,
                         const int application = OPUS_APPLICATION_AUDIO) {
     int error;
-    OpusEncoder* const handle = ::opus_encoder_create(freq, channels, application, &error);
+    OpusEncoder* const handle = ::opus_encoder_create(frequency, channels, application, &error);
     if (error != OPUS_OK) throw opus::error{error};
     assert(handle != nullptr);
     return encoder{handle};
@@ -135,6 +135,16 @@ protected:
   handle_ptr _handle{nullptr, ::opus_decoder_destroy};
 
 public:
+  // @see https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__decoder.html#ga753f6fe0b699c81cfd47d70c8e15a0bd
+  static decoder create(const int frequency,
+                        const int channels) {
+    int error;
+    OpusDecoder* const handle = ::opus_decoder_create(frequency, channels, &error);
+    if (error != OPUS_OK) throw opus::error{error};
+    assert(handle != nullptr);
+    return decoder{handle};
+  }
+
   explicit decoder() noexcept = default;
 
   explicit decoder(OpusDecoder* const handle) noexcept
