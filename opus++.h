@@ -45,6 +45,10 @@ public:
   explicit error(int code) noexcept
     : _code{code}, runtime_error{""} {}
 
+  int code() const noexcept {
+    return _code;
+  }
+
   virtual const char* what() const noexcept override {
     switch (_code) {
       case OPUS_ALLOC_FAIL:
@@ -81,13 +85,24 @@ public:
 
 protected:
   // @see https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__encoder.html#ga5f4c05b4b51cdffec5a55dbf17bbfa1c
-  handle_ptr _handle{nullptr, opus_encoder_destroy};
+  handle_ptr _handle{nullptr, ::opus_encoder_destroy};
 
 public:
+  // @see https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__encoder.html#gaa89264fd93c9da70362a0c9b96b9ca88
+  static encoder create(const int freq,
+                        const int channels,
+                        const int application = OPUS_APPLICATION_AUDIO) {
+    int error;
+    OpusEncoder* const handle = ::opus_encoder_create(freq, channels, application, &error);
+    if (error != OPUS_OK) throw opus::error{error};
+    assert(handle != nullptr);
+    return encoder{handle};
+  }
+
   explicit encoder() noexcept = default;
 
   explicit encoder(OpusEncoder* const handle) noexcept
-    : _handle{handle, opus_encoder_destroy} {}
+    : _handle{handle, ::opus_encoder_destroy} {}
 
   const OpusEncoder* handle() const noexcept {
     return _handle.get();
@@ -117,13 +132,13 @@ public:
 
 protected:
   // @see https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__decoder.html#gafebf4cb3c29c9317cac385446a76e36e
-  handle_ptr _handle{nullptr, opus_decoder_destroy};
+  handle_ptr _handle{nullptr, ::opus_decoder_destroy};
 
 public:
   explicit decoder() noexcept = default;
 
   explicit decoder(OpusDecoder* const handle) noexcept
-    : _handle{handle, opus_decoder_destroy} {}
+    : _handle{handle, ::opus_decoder_destroy} {}
 
   const OpusDecoder* handle() const noexcept {
     return _handle.get();
