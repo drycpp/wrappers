@@ -19,16 +19,56 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <opus.h> /* for libopus */
+#include <opus.h>   /* for libopus */
 
-#include <memory> /* for std::unique_ptr */
+#include <assert.h> /* for assert() */
+#include <memory>   /* for std::unique_ptr */
 
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace opus {
+  class error;
   class encoder;
   class decoder;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @see https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__errorcodes.html
+ */
+class opus::error : public std::runtime_error {
+protected:
+  int _code;
+
+public:
+  explicit error(int code) noexcept
+    : _code{code}, runtime_error{""} {}
+
+  virtual const char* what() const noexcept override {
+    switch (_code) {
+      case OPUS_ALLOC_FAIL:
+        return "memory allocation has failed";
+      case OPUS_BAD_ARG:
+        return "one or more invalid/out of range arguments";
+      case OPUS_BUFFER_TOO_SMALL:
+        return "not enough bytes allocated in the buffer";
+      case OPUS_INTERNAL_ERROR:
+        return "an internal error was detected";
+      case OPUS_INVALID_PACKET:
+        return "the compressed data passed is corrupted";
+      case OPUS_INVALID_STATE:
+        return "an encoder or decoder structure is invalid or already freed";
+      case OPUS_OK:
+        return "no error";
+      case OPUS_UNIMPLEMENTED:
+        return "invalid/unsupported request number";
+      default:
+        assert(_code);
+        return "unknown error from libopus";
+    }
+  }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
